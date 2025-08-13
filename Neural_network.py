@@ -89,7 +89,17 @@ def test_loop(dataloader, model, loss_fn):
     test_loss /= num_batches
     correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-    
+
+def save_model(model, filepath):
+    torch.save(model.state_dict(), filepath)
+    print(f"Model saved to {filepath}")
+
+def load_model(model_class, filepath, device):
+    model = model_class().to(device)
+    model.load_state_dict(torch.load(filepath, map_location=device))
+    model.eval()
+    return model
+
 loss_fn = nn.CrossEntropyLoss().to(device)
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -99,3 +109,5 @@ for t in range(epochs):
     train_loop(train_dataloader, model, loss_fn, optimizer)
     test_loop(test_dataloader, model, loss_fn)
 print("Done!")
+
+save_model(model, 'fashion_mnist_model.pth')
