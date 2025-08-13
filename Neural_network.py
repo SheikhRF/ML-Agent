@@ -34,6 +34,8 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
             nn.Linear(512, 10)
         )
 
@@ -110,4 +112,4 @@ for t in range(epochs):
     test_loop(test_dataloader, model, loss_fn)
 print("Done!")
 
-save_model(model, 'fashion_mnist_model.pth')
+save_model(model, 'AryaModel.pth')

@@ -19,8 +19,8 @@ test_data = datasets.FashionMNIST(
     transform=ToTensor()
 )
 
-train_dataloader = DataLoader(training_data, batch_size=64)
-test_dataloader = DataLoader(test_data, batch_size=64)
+train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
+test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"using {device} device")
@@ -34,6 +34,8 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
             nn.Linear(512, 10)
         )
 
@@ -43,7 +45,7 @@ class NeuralNetwork(nn.Module):
         return logits
 
 learning_rate = 1e-2
-epochs = 5
+epochs = 10
 batch_size = 64
 
 def train_loop(dataloader, model, loss_fn, optimizer):
@@ -123,7 +125,7 @@ if os.path.exists(model_path):
         # Train existing model
         print("Training existing model...")
         model = load_model(NeuralNetwork, model_path, device)
-        learning_rate = 1e-3
+        learning_rate = 5e-5
         loss_fn = nn.CrossEntropyLoss().to(device)
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
