@@ -21,8 +21,6 @@ test_data = datasets.FashionMNIST(
     transform=ToTensor()
 )
 
-train_dataloader = DataLoader(training_data, batch_size=64)
-test_dataloader = DataLoader(test_data, batch_size=64)
 
 labels_map = {
     0: "T-shirt/top",
@@ -81,11 +79,12 @@ def preprocess_image(image_path):
     transform = transforms.Compose([
         transforms.Grayscale(num_output_channels=1),  # Convert to grayscale
         transforms.Resize((28, 28)),                  # Resize to 28x28
-        transforms.ToTensor(),                        # Convert to tensor (0-1 range)
+        transforms.ToTensor()# Convert to tensor (0-1 range)
     ])
 
     img = Image.open(image_path)
     img = transform(img)
+    img = img.unsqueeze(0)  
     return img
 
 imagePath = input("Enter the path to the image you want to test: ")
