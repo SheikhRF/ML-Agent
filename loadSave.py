@@ -4,6 +4,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.transforms import ToTensor
+import matplotlib.pyplot as plt
 
 training_data = datasets.FashionMNIST(
     root="data",
@@ -34,9 +35,19 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Dropout(0.1),
+            nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Linear(512, 10)
+            nn.Dropout(0.1),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10)
         )
 
     def forward(self, x):
@@ -49,20 +60,23 @@ epochs = 10
 batch_size = 64
 
 def train_loop(dataloader, model, loss_fn, optimizer):
+    total_loss, num_batches = 0, 0
     size = len(dataloader.dataset)
     model.train()
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
         pred = model(X)
         loss = loss_fn(pred, y)
-
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
-
+        total_loss += loss.item()
+        num_batches += 1
+        
         if batch % 100 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+    return total_loss / num_batches
 
 def test_loop(dataloader, model, loss_fn):
     model.eval()
@@ -94,7 +108,7 @@ def load_model(model_class, filepath, device):
     return model
 
 # Check if a pre-trained model exists
-model_path = input("Enter the path to the pre-trained model")
+model_path = input("Enter the path to the pre-trained model ")
 
 if os.path.exists(model_path):
     print(f"Found existing model at {model_path}")
@@ -123,20 +137,34 @@ if os.path.exists(model_path):
         print("Training Done!")
         save_model(model, model_path)
     elif choice == '3':
+        loss=[]
+        iteration = []
+        epochs = int(input("Enter number of epochs to train the existing model: "))
+        learning_rate = input("Enter learning rate for training the existing model: ")
+        learning_rate = float(learning_rate) if learning_rate else 5e-5
         # Train existing model
         print("Training existing model...")
+        print(learning_rate)
         model = load_model(NeuralNetwork, model_path, device)
-        learning_rate = 5e-5
         loss_fn = nn.CrossEntropyLoss().to(device)
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
         for t in range(epochs):
             print(f"Epoch {t+1}\n-------------------------------")
-            train_loop(train_dataloader, model, loss_fn, optimizer)
+            loss.append(train_loop(train_dataloader, model, loss_fn, optimizer))
             test_loop(test_dataloader, model, loss_fn)
-        
+            iteration.append(t+1)
         print("Training Done!")
         save_model(model, model_path)
+        # Fixed version:
+        plt.figure(figsize=(10, 6))
+        plt.plot(iteration, loss, marker='o', color='blue', label='Training Loss')
+        plt.title('Training Loss Over Time')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.show()  # This is important!
 else:
     # No existing model, train new one
     print("No existing model found. Training new model...")

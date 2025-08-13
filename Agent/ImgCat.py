@@ -71,7 +71,7 @@ def load_model(model_class, filepath, device):
     return model
 
 
-model_path = input("Enter the path to the pre-trained model")
+model_path = "models\pleaseWork.pth"  # Update with your model path
 model = load_model(NeuralNetwork, model_path, device)
 
 def preprocess_image(image_path):
