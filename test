@@ -1,0 +1,27 @@
+import torch
+import numpy as np
+
+
+shape=(2,3,)
+randtensor = torch.rand(shape)
+onestensor = torch.ones(shape)
+zerostensor = torch.zeros(shape)
+
+print(f"randtensor: {randtensor}")
+print(f"onestensor: {onestensor}")
+print(f"zerostensor: {zerostensor}")
+
+# We move our tensor to the current accelerator if available
+if torch.accelerator.is_available():
+    randtensor = randtensor.to(torch.accelerator.current_accelerator())
+
+print(f"shape of randtensor: {randtensor.shape}")
+print(f"datatype of randtensor: {randtensor.dtype}")
+print(f"device tensor is stored on: {randtensor.device}")
+
+print(f"First row of randtensor: {randtensor[0]}")
+print(f"First column of randtensor: {randtensor[:, 0]}")
+print(f"Last column of randtensor: {randtensor[:, -1]}")
+randtensor[:, 1] = 0
+print(f"First row of randtensor after setting second column to 0: {randtensor[0]}")
+print(randtensor)
