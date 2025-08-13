@@ -44,7 +44,7 @@ class NeuralNetwork(nn.Module):
 
 model = NeuralNetwork().to(device)
 
-learning_rate = 1e-3
+learning_rate = 1e-2
 epochs = 5
 batch_size = 64
 
