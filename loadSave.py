@@ -38,13 +38,11 @@ class NeuralNetwork(nn.Module):
             nn.Dropout(0.1),
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Dropout(0.1),
             nn.Linear(256, 256),
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Linear(256, 128),
             nn.ReLU(),
-            nn.Dropout(0.1),
             nn.Linear(128, 128),
             nn.ReLU(),
             nn.Linear(128, 10)
@@ -127,7 +125,7 @@ if os.path.exists(model_path):
         print("Training new model...")
         model = NeuralNetwork().to(device)
         loss_fn = nn.CrossEntropyLoss().to(device)
-        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
         for t in range(epochs):
             print(f"Epoch {t+1}\n-------------------------------")
