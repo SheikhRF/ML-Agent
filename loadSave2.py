@@ -54,6 +54,40 @@ class NeuralNetwork(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
+class CNN(nn.module):
+    def __init__(self):
+        super().__init__()
+        self.conv_stack = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        
+        self.fc_stack = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * 3 * 3, 256),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(128, 10)
+        )
+        
+    def forward(self, x):
+        x = self.conv_stack(x)
+        x = self.fc_stack(x)
+        return x
+
 learning_rate = 1e-2
 epochs = 10
 batch_size = 64
@@ -115,7 +149,7 @@ if os.path.exists(model_path):
     
     if choice == '1':
         # Load existing model
-        model = load_model(NeuralNetwork, model_path, device)
+        model = load_model(CNN, model_path, device)
         print("Loaded pre-trained model. Testing performance...")
         
         loss_fn = nn.CrossEntropyLoss().to(device)
@@ -124,7 +158,7 @@ if os.path.exists(model_path):
     elif choice == '2':
         # Train new model
         print("Training new model...")
-        model = NeuralNetwork().to(device)
+        model = CNN().to(device)
         loss_fn = nn.CrossEntropyLoss().to(device)
         optimizer = torch.optim.NAdam(model.parameters(), lr=learning_rate)
 
@@ -144,7 +178,7 @@ if os.path.exists(model_path):
         # Train existing model
         print("Training existing model...")
         print(learning_rate)
-        model = load_model(NeuralNetwork, model_path, device)
+        model = load_model(CNN, model_path, device)
         loss_fn = nn.CrossEntropyLoss().to(device)
         optimizer = torch.optim.NAdam(model.parameters(), lr=learning_rate)
 
@@ -167,7 +201,7 @@ if os.path.exists(model_path):
 else:
     # No existing model, train new one
     print("No existing model found. Training new model...")
-    model = NeuralNetwork().to(device)
+    model = CNN().to(device)
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.NAdam(model.parameters(), lr=learning_rate)
 
