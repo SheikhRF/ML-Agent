@@ -41,29 +41,36 @@ print(f"using {device} device")
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, 512),
+        self.conv_stack = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(512, 256),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.Linear(256, 256),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        
+        self.fc_stack = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * 3 * 3, 256),
             nn.ReLU(),
-            nn.Dropout(0.1),
+            nn.Dropout(0.2),
             nn.Linear(256, 128),
             nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
+            nn.Dropout(0.2),
             nn.Linear(128, 10)
         )
-
+        
     def forward(self, x):
-        x = self.flatten(x)
-        logits = self.linear_relu_stack(x)
-        return logits
+        x = self.conv_stack(x)
+        x = self.fc_stack(x)
+        return x
 
 def load_model(model_class, filepath, device):
     model = model_class().to(device)
@@ -73,7 +80,7 @@ def load_model(model_class, filepath, device):
     return model
 
 
-model_path = input("Enter the path to the pre-trained model")
+model_path = input("Enter the path to the pre-trained model ")
 model = load_model(NeuralNetwork, model_path, device)
 
 def preprocess_image(image_path):

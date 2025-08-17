@@ -7,6 +7,8 @@ from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 import torch.optim as optim
 
+model_path = input("Enter the path to the pre-trained model ")
+
 training_data = datasets.FashionMNIST(
     root="data",
     train=True,
@@ -54,7 +56,7 @@ class NeuralNetwork(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
-class CNN(nn.module):
+class CNN(nn.Module):
     def __init__(self):
         super().__init__()
         self.conv_stack = nn.Sequential(
@@ -141,7 +143,7 @@ def load_model(model_class, filepath, device):
     return model
 
 # Check if a pre-trained model exists
-model_path = input("Enter the path to the pre-trained model ")
+
 
 if os.path.exists(model_path):
     print(f"Found existing model at {model_path}")
