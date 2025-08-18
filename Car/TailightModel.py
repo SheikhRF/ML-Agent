@@ -7,10 +7,12 @@ from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 import torch.optim as optim
 
+
+
 model_path = input("Enter the path to the pre-trained model ")
 
 transform = transforms.Compose([
-    transforms.Resize((128, 128)),
+    transforms.Resize((64, 64)),
     transforms.RandomHorizontalFlip(),
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
     transforms.ToTensor(),
@@ -19,7 +21,7 @@ transform = transforms.Compose([
 ])
 
 test_transform = transforms.Compose([
-    transforms.Resize((128, 128)),
+    transforms.Resize((64, 64)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                          std=[0.229, 0.224, 0.225])
@@ -28,21 +30,25 @@ test_transform = transforms.Compose([
     
 
 train_data = datasets.ImageFolder(
-    root="./Data", 
+    root="./Car/Data", 
     transform=transform
     )
 
 test_data  = datasets.ImageFolder(
-    root="./Data", 
-    test_transform=transform
+    root="./Car/Data", 
+    transform=transform
     )
 
-train_dataloader = DataLoader(train_data, batch_size=64, shuffle=True)
-test_dataloader  = DataLoader(test_data, batch_size=64, shuffle=True)
+train_dataloader = DataLoader(train_data, batch_size=32, shuffle=True)
+test_dataloader  = DataLoader(test_data, batch_size=32, shuffle=True)
+
+
 
 num_classes = len(train_data.classes)
-print("Classes:", train_data.classes)
-print(train_data.class_to_idx)
+
+class_to_index = train_data.class_to_idx
+index_to_class = {index: class_name for class_name, index in class_to_index.items()}
+
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"using {device} device")
@@ -67,7 +73,7 @@ class CNN(nn.Module):
         
         self.fc_stack = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(128 * 16 * 16, 256),
+            nn.Linear(128 * 8 * 8, 256),
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(256, 128),
@@ -83,7 +89,7 @@ class CNN(nn.Module):
 
 learning_rate = 1e-2
 epochs = 10
-batch_size = 64
+batch_size = 32
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     total_loss, num_batches = 0, 0
@@ -234,4 +240,4 @@ else:
     plt.ylabel('Loss')
     plt.legend()
     plt.grid(True, alpha=0.3)
-    plt.show()  # This is import
+    plt.show()  # This is important!
