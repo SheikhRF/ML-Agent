@@ -158,19 +158,34 @@ if os.path.exists(model_path):
         test_loop(test_dataloader, model, loss_fn)
         
     elif choice == '2':
-        # Train new model
-        print("Training new model...")
+        loss=[]
+        iteration = []
+        epochs = int(input("Enter number of epochs to train the existing model: "))
+        learning_rate = input("Enter learning rate for training the existing model: ")
+        learning_rate = float(learning_rate) if learning_rate else 5e-5
+        # Train existing model
+        print("Training existing model...")
+        print(learning_rate)
         model = CNN().to(device)
         loss_fn = nn.CrossEntropyLoss().to(device)
         optimizer = torch.optim.NAdam(model.parameters(), lr=learning_rate)
 
         for t in range(epochs):
             print(f"Epoch {t+1}\n-------------------------------")
-            train_loop(train_dataloader, model, loss_fn, optimizer)
+            loss.append(train_loop(train_dataloader, model, loss_fn, optimizer))
             test_loop(test_dataloader, model, loss_fn)
-        
+            iteration.append(t+1)
         print("Training Done!")
         save_model(model, model_path)
+        # Fixed version:
+        plt.figure(figsize=(10, 6))
+        plt.plot(iteration, loss, marker='o', color='blue', label='Training Loss')
+        plt.title('Training Loss Over Time')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.show()  # This is important!
     elif choice == '3':
         loss=[]
         iteration = []
@@ -201,16 +216,31 @@ if os.path.exists(model_path):
         plt.grid(True, alpha=0.3)
         plt.show()  # This is important!
 else:
-    # No existing model, train new one
-    print("No existing model found. Training new model...")
+    loss=[]
+    iteration = []
+    epochs = int(input("Enter number of epochs to train the existing model: "))
+    learning_rate = input("Enter learning rate for training the existing model: ")
+    learning_rate = float(learning_rate) if learning_rate else 5e-5
+    # Train existing model
+    print("Training existing model...")
+    print(learning_rate)
     model = CNN().to(device)
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.NAdam(model.parameters(), lr=learning_rate)
 
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
-        train_loop(train_dataloader, model, loss_fn, optimizer)
+        loss.append(train_loop(train_dataloader, model, loss_fn, optimizer))
         test_loop(test_dataloader, model, loss_fn)
-    
+        iteration.append(t+1)
     print("Training Done!")
     save_model(model, model_path)
+    # Fixed version:
+    plt.figure(figsize=(10, 6))
+    plt.plot(iteration, loss, marker='o', color='blue', label='Training Loss')
+    plt.title('Training Loss Over Time')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.show()  # This is important!
