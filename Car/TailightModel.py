@@ -39,8 +39,8 @@ test_data  = datasets.ImageFolder(
     transform=transform
     )
 
-train_dataloader = DataLoader(train_data, batch_size=32, shuffle=True)
-test_dataloader  = DataLoader(test_data, batch_size=32, shuffle=True)
+train_dataloader = DataLoader(train_data, batch_size=64, shuffle=True)
+test_dataloader  = DataLoader(test_data, batch_size=64, shuffle=True)
 
 
 
@@ -89,7 +89,7 @@ class CNN(nn.Module):
 
 learning_rate = 1e-2
 epochs = 10
-batch_size = 32
+batch_size = 64
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     total_loss, num_batches = 0, 0
